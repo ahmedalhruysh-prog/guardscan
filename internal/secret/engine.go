@@ -3,6 +3,7 @@ package secret
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/ahmedalhruysh-prog/guardscan/internal/core"
@@ -54,8 +55,11 @@ func (e *SecretEngine) Scan(file core.FileInfo) ([]finding.Finding, error) {
 		}
 
 		// 1. الكشف بالأنماط
-		results = append(results, e.detector.Detect(line, lineNum, file.RelPath)...)
-
+		filePath := file.RelPath
+		if filePath == "" {
+			filePath = filepath.Base(file.Path)
+		}
+		results = append(results, e.detector.Detect(line, lineNum, filePath)...)
 		// 2. الكشف بالعشوائية (للكلمات المفتاحية المشبوهة)
 		if strings.Contains(strings.ToLower(line), "key") || strings.Contains(strings.ToLower(line), "secret") {
 			// استخراج القيمة بعد علامة =

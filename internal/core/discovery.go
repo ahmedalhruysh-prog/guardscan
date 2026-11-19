@@ -81,7 +81,10 @@ func (d *DiscoveryEngine) Discover() ([]FileInfo, error) {
 			}
 		}
 
-		relPath, _ := filepath.Rel(d.RootPath, path)
+		relPath, err := filepath.Rel(absPath, path)
+		if err != nil {
+			relPath = filepath.Base(path) // احتياطي
+		}
 
 		files = append(files, FileInfo{
 			Path:      path,
