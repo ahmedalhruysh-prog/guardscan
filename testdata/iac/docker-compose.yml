@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    privileged: true
+    network_mode: host
+    volumes:
+      - /etc:/host-etc
+      - /var/run/docker.sock:/var/run/docker.sock

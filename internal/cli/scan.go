@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ahmedalhruysh-prog/guardscan/internal/core"
+	"github.com/ahmedalhruysh-prog/guardscan/internal/iac/compose"
 	"github.com/ahmedalhruysh-prog/guardscan/internal/iac/dockerfile"
 	"github.com/ahmedalhruysh-prog/guardscan/internal/secret"
 	"github.com/spf13/cobra"
@@ -54,22 +55,37 @@ var scanCmd = &cobra.Command{
 		// محرك IaC
 		if contains(scanners, "iac") {
 			fmt.Println("\n🏗️  Running IaC Engine...")
+
+			// Dockerfile
 			dockerEngine := dockerfile.NewEngine()
+			composeEngine := compose.NewEngine()
 			totalFindings := 0
+
 			for _, f := range files {
-				// 🔍 طباعة تشخيصية
-				fmt.Printf("   🔍 Checking %s (CanScan: %v)\n", f.RelPath, dockerEngine.CanScan(f))
-				if !dockerEngine.CanScan(f) {
-					continue
+				// Dockerfile
+				if dockerEngine.CanScan(f) {
+					findings, err := dockerEngine.Scan(f)
+					if err != nil {
+						fmt.Printf("   ⚠️  Error scanning %s: %v\n", f.RelPath, err)
+					} else {
+						for _, finding := range findings {
+							totalFindings++
+							fmt.Printf("   🚨 [%s] %s at %s:%d\n", finding.Severity, finding.Title, finding.File, finding.Line)
+						}
+					}
 				}
-				findings, err := dockerEngine.Scan(f)
-				if err != nil {
-					fmt.Printf("   ⚠️  Error scanning %s: %v\n", f.RelPath, err)
-					continue
-				}
-				for _, finding := range findings {
-					totalFindings++
-					fmt.Printf("   🚨 [%s] %s at %s:%d\n", finding.Severity, finding.Title, finding.File, finding.Line)
+
+				// Docker Compose
+				if composeEngine.CanScan(f) {
+					findings, err := composeEngine.Scan(f)
+					if err != nil {
+						fmt.Printf("   ⚠️  Error scanning %s: %v\n", f.RelPath, err)
+					} else {
+						for _, finding := range findings {
+							totalFindings++
+							fmt.Printf("   🚨 [%s] %s at %s:%d\n", finding.Severity, finding.Title, finding.File, finding.Line)
+						}
+					}
 				}
 			}
 			fmt.Printf("\n✅ IaC Engine found %d issues\n", totalFindings)
