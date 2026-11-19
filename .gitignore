@@ -16,3 +16,6 @@ coverage.txt
 # OS
 .DS_Store
 Thumbs.db
+# Test secrets (do not commit)
+testdata/secrets/vuln.txt
+testdata/**/*.txt
