@@ -1,0 +1,18 @@
+# Binaries
+guardscan.exe
+guardscan
+*.exe
+
+# Test outputs
+*.out
+*.test
+coverage.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
