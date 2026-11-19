@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ahmedalhruysh-prog/guardscan/internal/core"
+	"github.com/ahmedalhruysh-prog/guardscan/internal/secret"
 	"github.com/spf13/cobra"
 )
 
@@ -23,20 +24,46 @@ var scanCmd = &cobra.Command{
 		fmt.Printf("   Format:   %s\n", format)
 
 		// 1. اكتشاف الملفات
-		engine := core.NewDiscoveryEngine(targetPath)
-		files, err := engine.Discover()
+		discovery := core.NewDiscoveryEngine(targetPath)
+		files, err := discovery.Discover()
 		if err != nil {
 			return fmt.Errorf("discovery failed: %w", err)
 		}
 
 		fmt.Printf("\n📁 Discovered %d files\n", len(files))
-		for _, f := range files {
-			fmt.Printf("   - %s (%d bytes)\n", f.RelPath, f.Size)
+
+		// 2. تشغيل محرك الأسرار
+		if contains(scanners, "secret") {
+			fmt.Println("\n🔐 Running Secret Engine...")
+			engine := secret.NewSecretEngine()
+			totalFindings := 0
+
+			for _, f := range files {
+				findings, err := engine.Scan(f)
+				if err != nil {
+					fmt.Printf("   ⚠️  Error scanning %s: %v\n", f.RelPath, err)
+					continue
+				}
+				for _, finding := range findings {
+					totalFindings++
+					fmt.Printf("   🚨 [%s] %s at %s:%d\n", finding.Severity, finding.Title, finding.File, finding.Line)
+				}
+			}
+			fmt.Printf("\n✅ Secret Engine found %d issues\n", totalFindings)
 		}
 
-		fmt.Println("\n⏳ Secret & IaC engines not implemented yet (coming in Step 3.3).")
 		return nil
 	},
+}
+
+// contains يتحقق من وجود عنصر في شريحة
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 func init() {
