@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	"github.com/ahmedalhruysh-prog/guardscan/internal/core"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,20 @@ var scanCmd = &cobra.Command{
 		fmt.Printf("🔍 Scanning: %s\n", targetPath)
 		fmt.Printf("   Scanners: %v\n", scanners)
 		fmt.Printf("   Format:   %s\n", format)
-		fmt.Println("⏳ Engine not implemented yet (coming in Step 3.3).")
+
+		// 1. اكتشاف الملفات
+		engine := core.NewDiscoveryEngine(targetPath)
+		files, err := engine.Discover()
+		if err != nil {
+			return fmt.Errorf("discovery failed: %w", err)
+		}
+
+		fmt.Printf("\n📁 Discovered %d files\n", len(files))
+		for _, f := range files {
+			fmt.Printf("   - %s (%d bytes)\n", f.RelPath, f.Size)
+		}
+
+		fmt.Println("\n⏳ Secret & IaC engines not implemented yet (coming in Step 3.3).")
 		return nil
 	},
 }
