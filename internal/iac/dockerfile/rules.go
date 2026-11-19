@@ -28,8 +28,8 @@ var Rules = []Rule{
 	},
 	{
 		ID:          "IAC-DOCKER-002",
-		Title:       "Base image uses 'latest' tag",
-		Regex:       regexp.MustCompile(`(?i)^FROM\s+[^:]+$`),
+		Title:       "Base image uses 'latest' tag or no tag",
+		Regex:       regexp.MustCompile(`(?i)^FROM\s+([^:]+|.*:latest)$`),
 		Severity:    finding.SeverityMedium,
 		Confidence:  finding.ConfidenceMedium,
 		Remediation: "Pin the base image to a specific version or digest.",
