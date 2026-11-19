@@ -53,4 +53,22 @@ var Rules = []Rule{
 		Remediation: "Avoid mounting sensitive host directories; use named volumes.",
 		References:  []string{"https://docs.docker.com/compose/compose-file/#volumes"},
 	},
+	{
+		ID:          "IAC-COMPOSE-005",
+		Title:       "No read_only filesystem",
+		Regex:       regexp.MustCompile(`(?i)^\s*image:`), // نتحقق من وجود read_only لاحقاً
+		Severity:    finding.SeverityLow,
+		Confidence:  finding.ConfidenceLow,
+		Remediation: "Set 'read_only: true' if the service does not need to write to disk.",
+		References:  []string{"https://docs.docker.com/compose/compose-file/#read_only"},
+	},
+	{
+		ID:          "IAC-COMPOSE-006",
+		Title:       "No explicit user set",
+		Regex:       regexp.MustCompile(`(?i)^\s*image:`), // نتحقق من وجود user لاحقاً
+		Severity:    finding.SeverityMedium,
+		Confidence:  finding.ConfidenceMedium,
+		Remediation: "Set a non-root user for the service.",
+		References:  []string{"https://docs.docker.com/compose/compose-file/#user"},
+	},
 }
