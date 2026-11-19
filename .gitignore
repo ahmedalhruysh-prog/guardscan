@@ -19,3 +19,8 @@ Thumbs.db
 # Test secrets (do not commit)
 testdata/secrets/vuln.txt
 testdata/**/*.txt
+# Reports
+report.json
+*.json
+!go.mod
+!go.sum
